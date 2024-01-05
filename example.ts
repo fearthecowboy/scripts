@@ -1,0 +1,3 @@
+// example deno script
+// can be run with deno run -A https://...
+console.log('hi')
