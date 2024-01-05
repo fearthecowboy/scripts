@@ -1,0 +1,2 @@
+# scripts
+Deno scripts
