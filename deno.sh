@@ -20,51 +20,62 @@ fi
 
 if command -v deno >/dev/null; then
   # already have deno in path
+  echo "Deno is in the PATH already."
   if [ $sourced -eq 0 ]; then exit ; else return ; fi
 fi
 
 
 if ! command -v unzip >/dev/null; then
-	echo "Error: unzip is required to install Deno (see: https://github.com/denoland/deno_install#unzip-is-required )." 1>&2
-        if [ $sourced -eq 0 ]; then exit 1 ; else return 1 ; fi
+  echo "Error: unzip is required to install Deno (see: https://github.com/denoland/deno_install#unzip-is-required )." 1>&2
+  if [ $sourced -eq 0 ]; then exit 1 ; else return 1 ; fi
 fi
 
 if [ "$OS" = "Windows_NT" ]; then
-	target="x86_64-pc-windows-msvc"
+  target="x86_64-pc-windows-msvc"
 else
-	case $(uname -sm) in
-	"Darwin x86_64") target="x86_64-apple-darwin" ;;
-	"Darwin arm64") target="aarch64-apple-darwin" ;;
-	"Linux aarch64")
-		echo "Error: Official Deno builds for Linux aarch64 are not available. (see: https://github.com/denoland/deno/issues/1846 )" 1>&2
-  		if [ $sourced -eq 0 ]; then exit 1 ; else return 1; fi
-		;;
-	*) target="x86_64-unknown-linux-gnu" ;;
-	esac
+  case $(uname -sm) in
+  "Darwin x86_64") target="x86_64-apple-darwin" ;;
+  "Darwin arm64") target="aarch64-apple-darwin" ;;
+  "Linux aarch64")
+    echo "Error: Official Deno builds for Linux aarch64 are not available. (see: https://github.com/denoland/deno/issues/1846 )" 1>&2
+      if [ $sourced -eq 0 ]; then exit 1 ; else return 1; fi
+    ;;
+  *) target="x86_64-unknown-linux-gnu" ;;
+  esac
 fi
 
 if [ $# -eq 0 ]; then
-	deno_uri="https://github.com/denoland/deno/releases/latest/download/deno-${target}.zip"
+  deno_uri="https://github.com/denoland/deno/releases/latest/download/deno-${target}.zip"
 else
-	deno_uri="https://github.com/denoland/deno/releases/download/${1}/deno-${target}.zip"
+  deno_uri="https://github.com/denoland/deno/releases/download/${1}/deno-${target}.zip"
 fi
 
 deno_install="${DENO_INSTALL:-$HOME/.deno}"
 bin_dir="$deno_install/bin"
 exe="$bin_dir/deno"
 
-# check if it's already on disk
+# check if it is already on disk
 if [ -f "$exe" ]; then
-	# add to the environment and get out if it works
-	export DENO_INSTALL=$deno_install
-	export PATH=$DENO_INSTALL/bin:$PATH
-	if command -v deno >/dev/null; then 
- 		  if [ $sourced -eq 0 ]; then exit ; else return ; fi
- 	fi
+  echo "Deno installed already."
+  # add to the environment and get out if it works
+  export DENO_INSTALL=$deno_install
+  export PATH=$DENO_INSTALL/bin:$PATH	
+  if command -v deno >/dev/null; then
+    if [ $sourced -ne 0 ]; then return; else 
+      echo 
+      echo Dot-source this script to add the installed deno to the PATH
+      echo or
+      echo 
+      echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
+      echo "  export DENO_INSTALL=\"$deno_install\""
+      echo "  export PATH=\"\$DENO_INSTALL/bin:\$PATH\""
+      exit
+    fi
+  fi 
 fi
 
 if [ ! -d "$bin_dir" ]; then
-	mkdir -p "$bin_dir"
+  mkdir -p "$bin_dir"
 fi
 
 curl --fail --location -s --output "$exe.zip" "$deno_uri"
@@ -75,21 +86,24 @@ rm "$exe.zip"
 echo "Deno was installed successfully to $exe"
 
 if [ $sourced -ne 0 ]; then
-	export DENO_INSTALL=$deno_install
-	export PATH=$DENO_INSTALL/bin:$PATH
-        if [ $sourced -eq 0 ]; then exit ; else return ; fi
+  export DENO_INSTALL=$deno_install
+  export PATH=$DENO_INSTALL/bin:$PATH
+  if [ $sourced -eq 0 ]; then exit ; else return ; fi
 fi
 
 if command -v deno >/dev/null; then
-	if [ $sourced -eq 0 ]; then exit ; else return ; fi
+  if [ $sourced -eq 0 ]; then exit ; else return ; fi
 else
   case $SHELL in
-	/bin/zsh) shell_profile=".zshrc" ;;
-	*) shell_profile=".bashrc" ;;
-	esac
- 	echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
-	echo "  export DENO_INSTALL=\"$deno_install\""
-	echo "  export PATH=\"\$DENO_INSTALL/bin:\$PATH\""
-	echo "Run '$exe --help' to get started"
+  /bin/zsh) shell_profile=".zshrc" ;;
+  *) shell_profile=".bashrc" ;;
+  esac
+  echo 
+  echo Dot-source this script to add the installed deno to the PATH
+  echo or
+  echo 
+  echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
+  echo "  export DENO_INSTALL=\"$deno_install\""
+  echo "  export PATH=\"\$DENO_INSTALL/bin:\$PATH\""
 fi
 echo
