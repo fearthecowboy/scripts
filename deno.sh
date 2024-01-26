@@ -56,12 +56,15 @@ exe="$bin_dir/deno"
 
 # check if it is already on disk
 if [ -f "$exe" ]; then
-  echo "Deno installed already."
+  echo "Deno previously installed."
   # add to the environment and get out if it works
   export DENO_INSTALL=$deno_install
   export PATH=$DENO_INSTALL/bin:$PATH	
   if command -v deno >/dev/null; then
-    if [ $sourced -ne 0 ]; then return; else 
+    if [ $sourced -ne 0 ]; then 
+      echo "Added 'deno' to the PATH."
+      return; 
+    else 
       echo 
       echo Dot-source this script to add the installed deno to the PATH
       echo or
