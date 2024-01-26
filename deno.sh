@@ -60,14 +60,14 @@ rm "$exe.zip"
 echo "Deno was installed successfully to $exe"
 
 if [ $sourced -eq 0 ]; then
-	# echo no message
+	echo 
 else
 	export DENO_INSTALL=$deno_install
 	export PATH=$DENO_INSTALL/bin:$PATH
 fi
 
 if command -v deno >/dev/null; then
-	# echo "Run 'deno --help' to get started"
+	echo "Run 'deno --help' to get started"
 else
   case $SHELL in
 	/bin/zsh) shell_profile=".zshrc" ;;
