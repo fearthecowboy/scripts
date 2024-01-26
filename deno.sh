@@ -4,6 +4,11 @@
 
 set -e
 
+if command -v deno >/dev/null; then
+  # already have deno in path
+  exit 0
+fi
+
 # check to see if we've been dot-sourced (should work for most POSIX shells)
 sourced=0
 
@@ -48,11 +53,21 @@ deno_install="${DENO_INSTALL:-$HOME/.deno}"
 bin_dir="$deno_install/bin"
 exe="$bin_dir/deno"
 
+# check if it's already on disk
+if [ -f "$exe" ]; then
+	# add to the environment and get out if it works
+	export DENO_INSTALL=$deno_install
+	export PATH=$DENO_INSTALL/bin:$PATH
+	if command -v deno >/dev/null; then 
+ 		exit 0
+ 	fi
+fi
+
 if [ ! -d "$bin_dir" ]; then
 	mkdir -p "$bin_dir"
 fi
 
-curl --fail --location --progress-bar --output "$exe.zip" "$deno_uri"
+curl --fail --location -s --output "$exe.zip" "$deno_uri"
 unzip -d "$bin_dir" -o "$exe.zip"
 chmod +x "$exe"
 rm "$exe.zip"
@@ -67,7 +82,7 @@ else
 fi
 
 if command -v deno >/dev/null; then
-	echo "Run 'deno --help' to get started"
+	echo 
 else
   case $SHELL in
 	/bin/zsh) shell_profile=".zshrc" ;;
@@ -79,4 +94,3 @@ else
 	echo "Run '$exe --help' to get started"
 fi
 echo
-
