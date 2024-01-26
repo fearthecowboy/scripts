@@ -59,7 +59,9 @@ rm "$exe.zip"
 
 echo "Deno was installed successfully to $exe"
 
-if [ $sourced -eq 1 ]; then
+if [ $sourced -eq 0 ]; then
+    	echo "Hmm"
+else
 	export DENO_INSTALL=\"$deno_install\"
 	export PATH=\"\$DENO_INSTALL/bin:\$PATH\"
 fi
