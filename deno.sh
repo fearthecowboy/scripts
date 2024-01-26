@@ -60,23 +60,23 @@ rm "$exe.zip"
 echo "Deno was installed successfully to $exe"
 
 if [ $sourced -eq 0 ]; then
-    	echo "Hmm"
+	# echo no message
 else
 	export DENO_INSTALL=$deno_install
 	export PATH=$DENO_INSTALL/bin:$PATH
 fi
 
 if command -v deno >/dev/null; then
-	echo "Run 'deno --help' to get started"
+	# echo "Run 'deno --help' to get started"
 else
   case $SHELL in
 	/bin/zsh) shell_profile=".zshrc" ;;
 	*) shell_profile=".bashrc" ;;
 	esac
-	echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
+ 	echo "Manually add the directory to your \$HOME/$shell_profile (or similar)"
 	echo "  export DENO_INSTALL=\"$deno_install\""
 	echo "  export PATH=\"\$DENO_INSTALL/bin:\$PATH\""
 	echo "Run '$exe --help' to get started"
 fi
 echo
-echo "Stuck? Join our Discord https://discord.gg/deno"
+
