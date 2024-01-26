@@ -4,11 +4,6 @@
 
 set -e
 
-if command -v deno >/dev/null; then
-  # already have deno in path
-  exit 0
-fi
-
 # check to see if we've been dot-sourced (should work for most POSIX shells)
 sourced=0
 
@@ -23,10 +18,15 @@ else # All other shells: examine $0 for known shell binary filenames
   case ${0##*/} in sh|dash) sourced=1;; esac
 fi
 
+if command -v deno >/dev/null; then
+  # already have deno in path
+  if [ $sourced -eq 0 ]; then exit ; else return ; fi
+fi
+
 
 if ! command -v unzip >/dev/null; then
 	echo "Error: unzip is required to install Deno (see: https://github.com/denoland/deno_install#unzip-is-required )." 1>&2
-	exit 1
+        if [ $sourced -eq 0 ]; then exit 1 ; else return 1 ; fi
 fi
 
 if [ "$OS" = "Windows_NT" ]; then
@@ -37,7 +37,7 @@ else
 	"Darwin arm64") target="aarch64-apple-darwin" ;;
 	"Linux aarch64")
 		echo "Error: Official Deno builds for Linux aarch64 are not available. (see: https://github.com/denoland/deno/issues/1846 )" 1>&2
-		exit 1
+  		if [ $sourced -eq 0 ]; then exit 1 ; else return 1; fi
 		;;
 	*) target="x86_64-unknown-linux-gnu" ;;
 	esac
@@ -59,7 +59,7 @@ if [ -f "$exe" ]; then
 	export DENO_INSTALL=$deno_install
 	export PATH=$DENO_INSTALL/bin:$PATH
 	if command -v deno >/dev/null; then 
- 		exit 0
+ 		  if [ $sourced -eq 0 ]; then exit ; else return ; fi
  	fi
 fi
 
@@ -74,15 +74,14 @@ rm "$exe.zip"
 
 echo "Deno was installed successfully to $exe"
 
-if [ $sourced -eq 0 ]; then
-	echo 
-else
+if [ $sourced -ne 0 ]; then
 	export DENO_INSTALL=$deno_install
 	export PATH=$DENO_INSTALL/bin:$PATH
+        if [ $sourced -eq 0 ]; then exit ; else return ; fi
 fi
 
 if command -v deno >/dev/null; then
-	echo 
+	if [ $sourced -eq 0 ]; then exit ; else return ; fi
 else
   case $SHELL in
 	/bin/zsh) shell_profile=".zshrc" ;;
